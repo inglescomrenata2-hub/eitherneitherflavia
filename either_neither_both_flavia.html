@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Either, Neither, Both & Whether — Flávia</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F3EE;--surface:#FFF;--s2:#F0EAE1;--s3:#E8E0D4;
+  --ink:#1A120A;--ink2:#4A3C2C;--ink3:#8A7A65;
+  --border:#DDD5C5;--border2:#EAE3D8;
+  --ei:#1A5A8A;--ei2:#2E82C0;--ei3:#E6F0F8;
+  --nn:#6B1A1A;--nn2:#C04040;--nn3:#F8E6E6;
+  --bo:#1A6B3A;--bo2:#2A9A56;--bo3:#E5F4EC;
+  --wh:#6B501A;--wh2:#C08030;--wh3:#FBF2E0;
+  --green:#2A6E2A;--green-bg:#E5F3E5;
+  --red:#9A1A1A;--red-bg:#FAE8E8;
+  --amber:#7A4E00;--amber-bg:#FDF3DC;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);padding:2rem 1rem 5rem;font-size:15px;line-height:1.7;}
+.page{max-width:780px;margin:0 auto;}
+
+.hdr{background:var(--ink);border-radius:16px;padding:2.25rem 2rem 1.75rem;margin-bottom:2rem;position:relative;overflow:hidden;}
+.hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.04);pointer-events:none;}
+.hdr-eye{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#8A7A65;margin-bottom:.5rem;}
+.hdr h1{font-family:'Fraunces',serif;font-size:clamp(22px,4vw,32px);color:#F7F3EE;line-height:1.2;margin-bottom:.4rem;}
+.hdr-sub{font-size:13px;color:#6A5A50;margin-bottom:1.25rem;line-height:1.6;}
+.hdr-pills{display:flex;flex-wrap:wrap;gap:7px;}
+.hdr-pill{font-size:11px;font-weight:600;background:rgba(255,255,255,.07);color:#6A5A50;padding:3px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.09);}
+
+.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem;}
+.ref-card{border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+.ref-hdr{padding:.9rem 1.15rem;}
+.ref-hdr.ei{background:var(--ei);}
+.ref-hdr.nn{background:var(--nn);}
+.ref-hdr.bo{background:var(--bo);}
+.ref-hdr.wh{background:var(--wh);}
+.ref-hdr h2{font-family:'Fraunces',serif;font-size:15px;color:white;margin-bottom:1px;}
+.ref-hdr p{font-size:11px;color:rgba(255,255,255,.6);}
+.ref-body{padding:.9rem 1.15rem;background:var(--surface);}
+.ref-row{font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:.5rem;padding:.5rem .75rem;border-radius:7px;background:var(--s2);border-left:3px solid;}
+.ref-row.ei{border-color:var(--ei2);}
+.ref-row.nn{border-color:var(--nn2);}
+.ref-row.bo{border-color:var(--bo2);}
+.ref-row.wh{border-color:var(--wh2);}
+.ref-row:last-child{margin-bottom:0;}
+.ref-row em{font-style:normal;font-weight:700;}
+.ref-row.ei em{color:var(--ei);}
+.ref-row.nn em{color:var(--nn);}
+.ref-row.bo em{color:var(--bo);}
+.ref-row.wh em{color:var(--wh);}
+
+.sec-label{display:flex;align-items:center;gap:10px;margin:2rem 0 1rem;}
+.sec-label::before{content:'';display:block;width:24px;height:2px;background:var(--ink3);flex-shrink:0;}
+.sec-label span{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--ink3);}
+
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:1.75rem;overflow:hidden;}
+.ex-hdr{padding:.85rem 1.5rem;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:.85rem;background:var(--s2);}
+.ex-n{font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:var(--ink2);min-width:28px;}
+.ex-hdr-txt h2{font-size:14px;font-weight:600;color:var(--ink);}
+.ex-hdr-txt p{font-size:12px;color:var(--ink3);margin-top:1px;}
+.ctag{margin-left:auto;font-size:11px;font-weight:700;padding:3px 10px;border-radius:4px;flex-shrink:0;background:var(--s3);color:var(--ink2);}
+.ex-body{padding:1.25rem 1.5rem;}
+.instr{font-size:13px;color:var(--ink3);font-style:italic;margin-bottom:1rem;line-height:1.6;}
+
+.ex-list{display:flex;flex-direction:column;gap:.55rem;}
+.ex-item{background:var(--s2);border:1px solid var(--border2);border-radius:9px;padding:.65rem 1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px;line-height:1.9;transition:border-color .2s;}
+.ex-item:focus-within{border-color:var(--ink3);}
+.ex-item.col{flex-direction:column;align-items:flex-start;}
+.ex-l{font-size:12px;font-weight:700;color:var(--ink2);min-width:18px;flex-shrink:0;}
+.ex-b{flex:1;display:flex;align-items:center;flex-wrap:wrap;gap:4px;}
+.badge{font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px;margin-right:4px;flex-shrink:0;letter-spacing:.5px;text-transform:uppercase;}
+.badge.ei{background:var(--ei3);color:var(--ei);}
+.badge.nn{background:var(--nn3);color:var(--nn);}
+.badge.bo{background:var(--bo3);color:var(--bo);}
+.badge.wh{background:var(--wh3);color:var(--wh);}
+
+input[type=text]{border:none;border-bottom:2px solid var(--ink3);background:transparent;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);padding:2px 5px;min-width:120px;outline:none;transition:all .2s;}
+input[type=text]:focus{border-bottom-color:var(--ink);background:rgba(0,0,0,.03);border-radius:3px 3px 0 0;}
+input[type=text].sm{min-width:80px;}
+input[type=text].md{min-width:150px;}
+input[type=text].full{width:100%;min-width:unset;margin-top:5px;}
+input[type=text].ok{border-bottom-color:var(--green)!important;background:var(--green-bg)!important;}
+input[type=text].err{border-bottom-color:var(--red)!important;background:var(--red-bg)!important;}
+
+textarea{width:100%;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);padding:.65rem 1rem;resize:vertical;min-height:68px;outline:none;margin-top:5px;background:var(--s2);line-height:1.7;transition:border-color .2s;}
+textarea:focus{border-color:var(--ink);background:white;}
+textarea::placeholder{color:var(--ink3);}
+
+.mc-opts{display:flex;gap:1rem;flex-wrap:wrap;padding-left:24px;margin-top:7px;}
+.mc-opt{display:flex;align-items:center;gap:5px;font-size:14px;cursor:pointer;}
+.mc-opt input{accent-color:var(--ink);width:15px;height:15px;}
+
+.btn-check{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:white;border:none;border-radius:7px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-top:.85rem;font-family:'DM Sans',sans-serif;transition:background .15s;}
+.btn-check:hover{background:var(--ink2);}
+.score-bar{display:none;margin-top:.6rem;padding:.5rem 1rem;border-radius:7px;font-size:13px;font-weight:600;}
+.score-bar.good{background:var(--green-bg);border:1px solid #97C48A;color:var(--green);}
+.score-bar.partial{background:var(--amber-bg);border:1px solid #E8C84A;color:var(--amber);}
+.score-bar.retry{background:var(--red-bg);border:1px solid #E8A0A0;color:var(--red);}
+
+.mc-opt input.ok-radio + span{color:var(--green);font-weight:700;}
+.mc-opt input.err-radio + span{color:var(--red);}
+
+/* SPEAKING */
+.speak-wrap{background:var(--ink);border-radius:16px;padding:1.75rem;margin-bottom:1.75rem;}
+.speak-wrap h2{font-family:'Fraunces',serif;font-size:19px;color:#F7F3EE;margin-bottom:.25rem;}
+.speak-wrap .sub{font-size:13px;color:#5A4A40;margin-bottom:1.25rem;}
+.speak-cards{display:flex;flex-direction:column;gap:.85rem;}
+.speak-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:1.1rem 1.25rem;}
+.sc-top{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:.7rem;}
+.sc-n{font-family:'Fraunces',serif;font-size:28px;color:#9A8A7A;line-height:1;min-width:30px;flex-shrink:0;}
+.sc-txt{flex:1;}
+.sc-focus{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#7A6A60;margin-bottom:4px;}
+.sc-q{font-size:14px;color:#E8E0D6;line-height:1.65;}
+.sc-tip{font-size:12px;color:#5A4A40;font-style:italic;margin-top:5px;line-height:1.5;}
+.sc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.7rem;}
+.sc-tag{font-size:11px;font-weight:700;background:rgba(255,255,255,.08);color:#A09080;border:1px solid rgba(255,255,255,.1);padding:2px 8px;border-radius:4px;}
+.timer-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.t-disp{font-family:'Fraunces',serif;font-size:26px;color:#9A8A7A;min-width:52px;letter-spacing:1px;transition:color .3s;}
+.t-disp.danger{color:#E87070;}
+.t-disp.done{color:#70C870;}
+.btn-t{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#5A4A40;border-radius:6px;padding:4px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.btn-t:hover{border-color:rgba(255,255,255,.3);color:#9A8A7A;}
+.bar-wrap{flex:1;min-width:80px;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.bar-fill{height:100%;background:rgba(255,255,255,.25);border-radius:2px;transition:width 1s linear;width:100%;}
+.notes-wrap{margin-top:.85rem;}
+.notes-wrap label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#4A3A30;display:block;margin-bottom:4px;}
+.notes-wrap textarea{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.08);color:#E8E0D6;}
+.notes-wrap textarea:focus{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);}
+.notes-wrap textarea::placeholder{color:#4A3A30;}
+
+/* AK */
+.ak{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-top:2rem;}
+.ak>h2{font-family:'Fraunces',serif;font-size:16px;color:var(--ink);margin-bottom:1.1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);}
+.ak-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.ak-sec h4{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-bottom:.5rem;}
+.ak-sec ol{padding-left:1.1rem;font-size:13px;color:var(--ink2);line-height:2.1;}
+.ak-sec ol li strong{color:var(--ink);}
+.ak-note{font-size:12px;color:var(--ink3);font-style:italic;margin-top:4px;}
+
+@media(max-width:580px){
+  .ref-grid{grid-template-columns:1fr;}
+  .ak-grid{grid-template-columns:1fr;}
+  .ex-body,.ex-hdr{padding:1rem;}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hdr">
+  <div class="hdr-eye">Grammar Practice</div>
+  <h1>Either, Neither, Both<br>&amp; Whether</h1>
+  <p class="hdr-sub">Four words B1→B2 students often confuse — practised through your world as a geologist.</p>
+  <div class="hdr-pills">
+    <span class="hdr-pill">Level B1→B2</span>
+    <span class="hdr-pill">Geology &amp; Fieldwork</span>
+    <span class="hdr-pill">5 exercises + speaking</span>
+  </div>
+</header>
+
+<!-- REFERENCE -->
+<div class="ref-grid">
+  <div class="ref-card">
+    <div class="ref-hdr ei"><h2>either … or</h2><p>one OR the other (not both)</p></div>
+    <div class="ref-body">
+      <div class="ref-row ei"><em>Either</em> the GPS <em>or</em> the compass will help us navigate.<br><span style="font-size:11px;color:var(--ink3)">→ one of two options</span></div>
+      <div class="ref-row ei">You can use <em>either</em> method — both work.<br><span style="font-size:11px;color:var(--ink3)">→ any one of the two (free choice)</span></div>
+      <div class="ref-row ei"><em>Either</em> of the samples is suitable.<br><span style="font-size:11px;color:var(--ink3)">→ either + of + plural noun, singular verb</span></div>
+    </div>
+  </div>
+  <div class="ref-card">
+    <div class="ref-hdr nn"><h2>neither … nor</h2><p>not one AND not the other</p></div>
+    <div class="ref-body">
+      <div class="ref-row nn"><em>Neither</em> the drill <em>nor</em> the corer was working.<br><span style="font-size:11px;color:var(--ink3)">→ negative for both</span></div>
+      <div class="ref-row nn"><em>Neither</em> of the results was reliable.<br><span style="font-size:11px;color:var(--ink3)">→ neither + of + plural noun, singular verb</span></div>
+      <div class="ref-row nn">"Basalt or granite?" — "<em>Neither.</em>"<br><span style="font-size:11px;color:var(--ink3)">→ standing alone as a negative answer</span></div>
+    </div>
+  </div>
+  <div class="ref-card">
+    <div class="ref-hdr bo"><h2>both … and</h2><p>the two together, at the same time</p></div>
+    <div class="ref-body">
+      <div class="ref-row bo"><em>Both</em> travertines <em>and</em> limestone are carbonates.<br><span style="font-size:11px;color:var(--ink3)">→ includes two, always plural</span></div>
+      <div class="ref-row bo"><em>Both</em> methods gave consistent results.<br><span style="font-size:11px;color:var(--ink3)">→ both + plural noun</span></div>
+      <div class="ref-row bo">She is <em>both</em> a geologist <em>and</em> a volcanologist.<br><span style="font-size:11px;color:var(--ink3)">→ two roles at once</span></div>
+    </div>
+  </div>
+  <div class="ref-card">
+    <div class="ref-hdr wh"><h2>whether</h2><p>if — indirect questions &amp; alternatives</p></div>
+    <div class="ref-body">
+      <div class="ref-row wh">We need to check <em>whether</em> the equipment is working.<br><span style="font-size:11px;color:var(--ink3)">→ indirect yes/no question</span></div>
+      <div class="ref-row wh">I'm not sure <em>whether</em> to use method A <em>or</em> B.<br><span style="font-size:11px;color:var(--ink3)">→ deciding between options</span></div>
+      <div class="ref-row wh"><em>Whether</em> or not it rains, we continue.<br><span style="font-size:11px;color:var(--ink3)">→ regardless of one alternative</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-label"><span>Exercises</span></div>
+
+<!-- EX 1 — MULTIPLE CHOICE -->
+<div class="ex-card">
+  <div class="ex-hdr">
+    <div class="ex-n">1</div>
+    <div class="ex-hdr-txt"><h2>Choose the correct word</h2><p>Select either / neither / both / whether</p></div>
+    <span class="ctag">Comprehension</span>
+  </div>
+  <div class="ex-body">
+    <p class="instr">Selecione a palavra que completa melhor cada frase. Pense no significado com cuidado.</p>
+    <div class="ex-list">
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">1</span><span>We still don't know ___ the new drilling method will produce better results.</span></div>
+        <div class="mc-opts">
+          <label class="mc-opt"><input type="radio" name="c1" value="a"><span>a) either</span></label>
+          <label class="mc-opt"><input type="radio" name="c1" value="b"><span>b) whether</span></label>
+          <label class="mc-opt"><input type="radio" name="c1" value="c"><span>c) both</span></label>
+        </div>
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">2</span><span>___ the core sample ___ the thin section showed any signs of contamination.</span></div>
+        <div class="mc-opts">
+          <label class="mc-opt"><input type="radio" name="c2" value="a"><span>a) Both … and</span></label>
+          <label class="mc-opt"><input type="radio" name="c2" value="b"><span>b) Either … or</span></label>
+          <label class="mc-opt"><input type="radio" name="c2" value="c"><span>c) Neither … nor</span></label>
+        </div>
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">3</span><span>___ Roman travertines ___ pre-salt travertines form through calcium carbonate precipitation.</span></div>
+        <div class="mc-opts">
+          <label class="mc-opt"><input type="radio" name="c3" value="a"><span>a) Neither … nor</span></label>
+          <label class="mc-opt"><input type="radio" name="c3" value="b"><span>b) Both … and</span></label>
+          <label class="mc-opt"><input type="radio" name="c3" value="c"><span>c) Either … or</span></label>
+        </div>
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">4</span><span>You can submit the report ___ by email ___ through the online system — it doesn't matter which.</span></div>
+        <div class="mc-opts">
+          <label class="mc-opt"><input type="radio" name="c4" value="a"><span>a) both … and</span></label>
+          <label class="mc-opt"><input type="radio" name="c4" value="b"><span>b) neither … nor</span></label>
+          <label class="mc-opt"><input type="radio" name="c4" value="c"><span>c) either … or</span></label>
+        </div>
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">5</span><span>I'm not sure ___ to fly to the conference directly or stop in Miami first.</span></div>
+        <div class="mc-opts">
+          <label class="mc-opt"><input type="radio" name="c5" value="a"><span>a) neither</span></label>
+          <label class="mc-opt"><input type="radio" name="c5" value="b"><span>b) whether</span></label>
+          <label class="mc-opt"><input type="radio" name="c5" value="c"><span>c) either</span></label>
+        </div>
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">6</span><span>___ of the two samples was adequate — we had to go back to the field.</span></div>
+        <div class="mc-opts">
+          <label class="mc-opt"><input type="radio" name="c6" value="a"><span>a) Either</span></label>
+          <label class="mc-opt"><input type="radio" name="c6" value="b"><span>b) Neither</span></label>
+          <label class="mc-opt"><input type="radio" name="c6" value="c"><span>c) Both</span></label>
+        </div>
+      </div>
+
+    </div>
+    <button class="btn-check" onclick="checkEx1()">Check ✓</button>
+    <div id="sc1" class="score-bar"></div>
+  </div>
+</div>
+
+<!-- EX 2 — FILL IN -->
+<div class="ex-card">
+  <div class="ex-hdr">
+    <div class="ex-n">2</div>
+    <div class="ex-hdr-txt"><h2>Fill in the blanks</h2><p>Complete with either/or · neither/nor · both/and · whether</p></div>
+    <span class="ctag">Grammar</span>
+  </div>
+  <div class="ex-body">
+    <p class="instr">Complete cada frase. Às vezes é uma palavra, às vezes um par.</p>
+    <div class="ex-list">
+
+      <div class="ex-item">
+        <span class="ex-l">A</span>
+        <div class="ex-b"><span class="badge wh">whether</span>The team discussed <input type="text" id="f1" class="md" placeholder="..."> to use satellite imaging or conduct a ground survey.</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">B</span>
+        <div class="ex-b"><span class="badge bo">both</span><input type="text" id="f2" class="sm" placeholder="..."> the fieldwork <input type="text" id="f2b" class="sm" placeholder="..."> the lab analysis confirmed the same result.</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">C</span>
+        <div class="ex-b"><span class="badge nn">neither</span><input type="text" id="f3" class="sm" placeholder="..."> the GPS signal <input type="text" id="f3b" class="sm" placeholder="..."> the radio was working in the remote canyon.</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">D</span>
+        <div class="ex-b"><span class="badge ei">either</span>We can drill at <input type="text" id="f4" class="sm" placeholder="..."> Site A <input type="text" id="f4b" class="sm" placeholder="..."> Site B — both look promising.</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">E</span>
+        <div class="ex-b"><span class="badge wh">whether</span>I still haven't decided <input type="text" id="f5" class="md" placeholder="..."> or not to apply for the research grant.</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">F</span>
+        <div class="ex-b"><span class="badge bo">both</span>The presentation was <input type="text" id="f6" class="sm" placeholder="..."> challenging <input type="text" id="f6b" class="sm" placeholder="..."> rewarding — I'm glad I did it.</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">G</span>
+        <div class="ex-b"><span class="badge nn">neither</span>"Did you find granite or basalt at the outcrop?" — "<input type="text" id="f7" class="md" placeholder="...">. It was all schist."</div>
+      </div>
+
+      <div class="ex-item">
+        <span class="ex-l">H</span>
+        <div class="ex-b"><span class="badge wh">whether</span><input type="text" id="f8" class="md" placeholder="..."> or not the results are published, the data we collected was extremely valuable.</div>
+      </div>
+
+    </div>
+    <button class="btn-check" onclick="checkEx2()">Check ✓</button>
+    <div id="sc2" class="score-bar"></div>
+  </div>
+</div>
+
+<!-- EX 3 — ERROR CORRECTION -->
+<div class="ex-card">
+  <div class="ex-hdr">
+    <div class="ex-n">3</div>
+    <div class="ex-hdr-txt"><h2>Spot the mistake</h2><p>Cada frase tem um erro — reescreva corretamente</p></div>
+    <span class="ctag">Error correction</span>
+  </div>
+  <div class="ex-body">
+    <p class="instr">Encontre o erro e escreva a frase corrigida no campo abaixo. Atenção: uma das frases está correta — identifique qual é!</p>
+    <div class="ex-list">
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">1</span><span style="font-size:14px;font-style:italic;color:var(--ink2)">"Neither the first sample or the second one was suitable."</span></div>
+        <input type="text" id="e1" class="full" placeholder="Corrected sentence...">
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">2</span><span style="font-size:14px;font-style:italic;color:var(--ink2)">"I don't know if whether the conference is in October or November."</span></div>
+        <input type="text" id="e2" class="full" placeholder="Corrected sentence...">
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">3</span><span style="font-size:14px;font-style:italic;color:var(--ink2)">"Both the geologist and the technician was in the field that day."</span></div>
+        <input type="text" id="e3" class="full" placeholder="Corrected sentence...">
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">4 ⭐</span><span style="font-size:14px;font-style:italic;color:var(--ink2)">"You can use either of the methods, and they both work fine."</span></div>
+        <input type="text" id="e4" class="full" placeholder="Esta frase está CORRETA ou tem erro? Explique por que either funciona aqui...">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- EX 4 — REWRITE -->
+<div class="ex-card">
+  <div class="ex-hdr">
+    <div class="ex-n">4</div>
+    <div class="ex-hdr-txt"><h2>Rewrite using the word in brackets</h2><p>Mesmo significado — estrutura diferente</p></div>
+    <span class="ctag">Production</span>
+  </div>
+  <div class="ex-body">
+    <p class="instr">Reescreva cada frase mantendo o mesmo significado. Use a palavra indicada.</p>
+    <div class="ex-list" style="gap:.75rem">
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">1</span><div>
+          <div style="font-size:14px;color:var(--ink2);font-style:italic">"The data logger didn't work. The compass didn't work either."</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">→ use: <strong>neither … nor</strong></div>
+        </div></div>
+        <input type="text" id="r1" class="full" placeholder="Neither...">
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">2</span><div>
+          <div style="font-size:14px;color:var(--ink2);font-style:italic">"I don't know if we'll get funding for the next field season."</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">→ use: <strong>whether</strong></div>
+        </div></div>
+        <input type="text" id="r2" class="full" placeholder="I don't know whether...">
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">3</span><div>
+          <div style="font-size:14px;color:var(--ink2);font-style:italic">"Travertines are scientifically interesting. They also have huge economic value."</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">→ use: <strong>both … and</strong></div>
+        </div></div>
+        <input type="text" id="r3" class="full" placeholder="Travertines are both...">
+      </div>
+
+      <div class="ex-item col">
+        <div style="display:flex;gap:8px;align-items:flex-start;width:100%"><span class="ex-l">4</span><div>
+          <div style="font-size:14px;color:var(--ink2);font-style:italic">"You can fly to the conference or take the train — choose whichever you prefer."</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px">→ use: <strong>either … or</strong></div>
+        </div></div>
+        <input type="text" id="r4" class="full" placeholder="You can either...">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- EX 5 — FREE WRITING -->
+<div class="ex-card">
+  <div class="ex-hdr">
+    <div class="ex-n">5</div>
+    <div class="ex-hdr-txt"><h2>Write your own sentences</h2><p>Use cada estrutura uma vez — sobre seu trabalho ou vida</p></div>
+    <span class="ctag">Free production</span>
+  </div>
+  <div class="ex-body">
+    <p class="instr">Escreva uma frase para cada estrutura. Use seu próprio contexto — geologia, a conferência, fieldwork, decisões de carreira, qualquer coisa real.</p>
+    <div class="ex-list" style="gap:.75rem">
+      <div class="ex-item col">
+        <div><span class="badge ei">either … or</span></div>
+        <textarea placeholder="In my work, either... or...  /  Either of the..."></textarea>
+      </div>
+      <div class="ex-item col">
+        <div><span class="badge nn">neither … nor</span></div>
+        <textarea placeholder="Neither... nor...  /  Neither of the..."></textarea>
+      </div>
+      <div class="ex-item col">
+        <div><span class="badge bo">both … and</span></div>
+        <textarea placeholder="Both... and...  /  The research was both..."></textarea>
+      </div>
+      <div class="ex-item col">
+        <div><span class="badge wh">whether</span></div>
+        <textarea placeholder="I'm not sure whether...  /  Whether or not..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPEAKING -->
+<div class="sec-label"><span>Speaking</span></div>
+<div class="speak-wrap">
+  <h2>Speaking Cards</h2>
+  <p class="sub">Inicie o timer. Tente usar a estrutura indicada pelo menos duas vezes em cada resposta.</p>
+  <div class="speak-cards">
+
+    <div class="speak-card">
+      <div class="sc-top">
+        <div class="sc-n">1</div>
+        <div class="sc-txt">
+          <div class="sc-focus">either … or + whether — 60 seconds</div>
+          <div class="sc-q">Think about your research on pre-salt travertines. Are there moments when you have to decide <strong>either</strong> one method <strong>or</strong> another? Talk about a real decision you faced — <strong>whether</strong> to use one approach or another, and why you chose what you chose.</div>
+          <div class="sc-tip">💡 "We had to decide either... or... / I wasn't sure whether to... / Either method would have worked, but..."</div>
+        </div>
+      </div>
+      <div class="sc-tags"><span class="sc-tag">either … or</span><span class="sc-tag">whether</span></div>
+      <div class="timer-row">
+        <div class="t-disp" id="td1">1:00</div>
+        <button class="btn-t" onclick="startT(1,60)">▶ Start</button>
+        <button class="btn-t" onclick="resetT(1,60)">↺ Reset</button>
+        <div class="bar-wrap"><div class="bar-fill" id="tb1"></div></div>
+      </div>
+      <div class="notes-wrap"><label>Notes</label><textarea placeholder="Key ideas before you speak..."></textarea></div>
+    </div>
+
+    <div class="speak-card">
+      <div class="sc-top">
+        <div class="sc-n">2</div>
+        <div class="sc-txt">
+          <div class="sc-focus">both … and + neither … nor — 60 seconds</div>
+          <div class="sc-q">Compare your fieldwork in Brazil with what Denali does at the East Pacific Rise. What do <strong>both</strong> situations have in common? Is there anything <strong>neither</strong> of you has to deal with that the other does?</div>
+          <div class="sc-tip">💡 "Both my fieldwork and Denali's involve... / Neither of us has to... / Both environments are..."</div>
+        </div>
+      </div>
+      <div class="sc-tags"><span class="sc-tag">both … and</span><span class="sc-tag">neither … nor</span><span class="sc-tag">neither of us</span></div>
+      <div class="timer-row">
+        <div class="t-disp" id="td2">1:00</div>
+        <button class="btn-t" onclick="startT(2,60)">▶ Start</button>
+        <button class="btn-t" onclick="resetT(2,60)">↺ Reset</button>
+        <div class="bar-wrap"><div class="bar-fill" id="tb2"></div></div>
+      </div>
+      <div class="notes-wrap"><label>Notes</label><textarea placeholder="Key ideas before you speak..."></textarea></div>
+    </div>
+
+    <div class="speak-card">
+      <div class="sc-top">
+        <div class="sc-n">3</div>
+        <div class="sc-txt">
+          <div class="sc-focus">all four structures — 90 seconds</div>
+          <div class="sc-q">Reflect on your career so far. Talk about choices you've made, things that were <strong>both</strong> challenging and rewarding, moments where <strong>neither</strong> option felt right, times you weren't sure <strong>whether</strong> to go one way or another. Try to use all four structures naturally.</div>
+          <div class="sc-tip">💡 Challenge: use either / neither / both / whether at least once each.</div>
+        </div>
+      </div>
+      <div class="sc-tags"><span class="sc-tag">either … or</span><span class="sc-tag">neither … nor</span><span class="sc-tag">both … and</span><span class="sc-tag">whether</span></div>
+      <div class="timer-row">
+        <div class="t-disp" id="td3">1:30</div>
+        <button class="btn-t" onclick="startT(3,90)">▶ Start</button>
+        <button class="btn-t" onclick="resetT(3,90)">↺ Reset</button>
+        <div class="bar-wrap"><div class="bar-fill" id="tb3"></div></div>
+      </div>
+      <div class="notes-wrap"><label>Notes</label><textarea placeholder="Key ideas before you speak..."></textarea></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ANSWER KEY -->
+<div class="ak">
+  <h2>Answer Key — Teacher's Reference</h2>
+  <div class="ak-grid">
+    <div class="ak-sec">
+      <h4>Exercise 1 — Multiple choice</h4>
+      <ol>
+        <li><strong>b) whether</strong> — indirect yes/no question</li>
+        <li><strong>c) Neither … nor</strong> — ambos negativos</li>
+        <li><strong>b) Both … and</strong> — verdade para os dois</li>
+        <li><strong>c) either … or</strong> — escolha livre entre dois</li>
+        <li><strong>b) whether</strong> — decidindo entre opções</li>
+        <li><strong>b) Neither</strong> — nenhum dos dois era adequado</li>
+      </ol>
+    </div>
+    <div class="ak-sec">
+      <h4>Exercise 2 — Fill in the blanks</h4>
+      <ol type="A">
+        <li><strong>whether</strong></li>
+        <li><strong>Both / and</strong></li>
+        <li><strong>Neither / nor</strong></li>
+        <li><strong>either / or</strong></li>
+        <li><strong>whether</strong></li>
+        <li><strong>both / and</strong></li>
+        <li><strong>Neither</strong></li>
+        <li><strong>Whether</strong></li>
+      </ol>
+    </div>
+    <div class="ak-sec">
+      <h4>Exercise 3 — Error correction</h4>
+      <ol>
+        <li>Erro: "or" → <strong>neither … <em>nor</em></strong></li>
+        <li>Erro: "if whether" → usar <strong>apenas "whether"</strong> (nunca os dois juntos)</li>
+        <li>Erro: "was" → <strong>were</strong> (both … and → plural verb)</li>
+        <li>✅ <strong>CORRETA</strong> — "either of" = qualquer um dos dois é aceitável. Bom ponto para discutir: either = escolha livre; both = os dois juntos.</li>
+      </ol>
+      <p class="ak-note">Item 4 é uma armadilha proposital. Vale discutir por que está correto.</p>
+    </div>
+    <div class="ak-sec">
+      <h4>Exercise 4 — Rewrite (model answers)</h4>
+      <ol>
+        <li>Neither the data logger nor the compass worked.</li>
+        <li>I don't know whether we'll get funding for the next field season.</li>
+        <li>Travertines are both scientifically interesting and economically valuable.</li>
+        <li>You can either fly to the conference or take the train.</li>
+      </ol>
+      <p class="ak-note">Aceitar qualquer reescrita que preserve o significado e use a estrutura correta.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+function norm(s){return s.trim().toLowerCase().replace(/\s+/g,' ');}
+
+const ans1={c1:'b',c2:'c',c3:'b',c4:'c',c5:'b',c6:'b'};
+const ans2={
+  f1:['whether'],
+  f2:['both'],f2b:['and'],
+  f3:['neither'],f3b:['nor'],
+  f4:['either'],f4b:['or'],
+  f5:['whether'],
+  f6:['both'],f6b:['and'],
+  f7:['neither'],
+  f8:['whether']
+};
+
+function checkEx1(){
+  let ok=0,t=Object.keys(ans1).length;
+  for(const[n,a]of Object.entries(ans1)){
+    const radios=document.querySelectorAll('input[name="'+n+'"]');
+    let chosen=null;
+    radios.forEach(r=>{r.className='';if(r.checked)chosen=r;});
+    if(chosen){
+      if(chosen.value===a){chosen.className='ok-radio';ok++;}
+      else chosen.className='err-radio';
+    }
+  }
+  showScore('sc1',ok,t);
+}
+
+function checkEx2(){
+  let ok=0,t=Object.keys(ans2).length;
+  for(const[id,acc]of Object.entries(ans2)){
+    const el=document.getElementById(id);if(!el)continue;
+    const v=norm(el.value);
+    el.className=el.className.replace(/ ?(ok|err)/g,'');
+    if(!v)continue;
+    const c=Array.isArray(acc)?acc.includes(v):v===acc;
+    el.className+=(c?' ok':' err');
+    if(c)ok++;
+  }
+  showScore('sc2',ok,t);
+}
+
+function showScore(id,ok,total){
+  const bar=document.getElementById(id);
+  bar.style.display='block';
+  if(ok===total){bar.className='score-bar good';bar.textContent=ok+' / '+total+' — 🎉 Perfect!';}
+  else if(ok>=Math.ceil(total*.6)){bar.className='score-bar partial';bar.textContent=ok+' / '+total+' — Good! Review the marked ones.';}
+  else{bar.className='score-bar retry';bar.textContent=ok+' / '+total+' — Review the reference cards and try again!';}
+}
+
+const T={};
+function startT(n,total){
+  if(T[n]&&T[n].on)return;
+  const disp=document.getElementById('td'+n);
+  const bar=document.getElementById('tb'+n);
+  let s=total;
+  disp.className='t-disp';bar.style.width='100%';
+  T[n]={on:true};
+  T[n].iv=setInterval(()=>{
+    s--;
+    const m=Math.floor(s/60),sec=s%60;
+    disp.textContent=m+':'+(sec<10?'0':'')+sec;
+    bar.style.width=(s/total*100)+'%';
+    if(s<=10)disp.className='t-disp danger';
+    if(s<=0){clearInterval(T[n].iv);T[n].on=false;disp.textContent='Done!';disp.className='t-disp done';bar.style.width='0%';}
+  },1000);
+}
+function resetT(n,total){
+  if(T[n]&&T[n].iv)clearInterval(T[n].iv);
+  if(T[n])T[n].on=false;
+  const disp=document.getElementById('td'+n);
+  const bar=document.getElementById('tb'+n);
+  const m=Math.floor(total/60),s=total%60;
+  disp.textContent=m+':'+(s<10?'0':'')+s;
+  disp.className='t-disp';bar.style.width='100%';
+}
+</script>
+</body>
+</html>
